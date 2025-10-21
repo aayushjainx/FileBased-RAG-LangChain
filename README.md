@@ -4,9 +4,11 @@ A Retrieval-Augmented Generation (RAG) application built with LangChain for docu
 
 ## 🚀 Features
 
-- **Document Processing**: Support for PDF documents using PyMuPDF and PyPDF
+- **Document Processing**: Support for PDF and text documents using PyMuPDF and PyPDF
 - **LangChain Integration**: Built with LangChain for robust AI workflows
 - **RAG Implementation**: Retrieve relevant information and generate accurate responses
+- **Jupyter Notebook Support**: Interactive development with document.ipynb
+- **Sample Data**: Pre-configured text and PDF files for testing
 - **Modern Python**: Uses Python 3.14 with UV package management
 
 ## 📋 Prerequisites
@@ -38,26 +40,48 @@ A Retrieval-Augmented Generation (RAG) application built with LangChain for docu
 
 ## 🏃‍♂️ Quick Start
 
-Run the main application:
+### Running the Main Application
 
 ```bash
 uv run main.py
 ```
 
+### Using Jupyter Notebook
+
+1. **Start Jupyter notebook:**
+
+   ```bash
+   uv run jupyter notebook
+   ```
+
+2. **Open the example notebook:**
+   Navigate to `notebook/document.ipynb` for interactive document processing examples
+
+3. **Alternative - Use VS Code:**
+   Open `notebook/document.ipynb` directly in VS Code with the Python extension
+
 ## 📁 Project Structure
 
 ```
 langchain-rag/
-├── main.py              # Main application entry point
-├── pyproject.toml       # Project configuration and dependencies
-├── requirements.txt     # Package requirements
-├── .python-version      # Python version specification
-├── .gitignore          # Git ignore rules
-└── README.md           # This file
+├── main.py                    # Main application entry point
+├── pyproject.toml            # Project configuration and dependencies
+├── requirements.txt          # Package requirements
+├── .python-version           # Python version specification
+├── .gitignore               # Git ignore rules
+├── README.md                # This file
+├── data/                    # Data directory
+│   ├── text_files/          # Sample text documents
+│   │   ├── python_intro.txt
+│   │   └── machine_learning.txt
+│   └── pdf_files/           # PDF documents for processing
+└── notebook/                # Jupyter notebooks
+    └── document.ipynb       # Interactive document processing examples
 ```
 
 ## 📦 Dependencies
 
+- **ipykernel**: Jupyter kernel for running Python notebooks
 - **langchain**: Core LangChain framework for building AI applications
 - **langchain-core**: Essential LangChain components and abstractions
 - **langchain-community**: Community-contributed LangChain integrations
@@ -89,6 +113,19 @@ uv add --dev pytest
 uv run pytest
 ```
 
+### Working with Jupyter Notebooks
+
+```bash
+# Install additional Jupyter tools
+uv add --dev notebook jupyterlab
+
+# Start Jupyter Lab
+uv run jupyter lab
+
+# Start classic Jupyter Notebook
+uv run jupyter notebook
+```
+
 ### Code Formatting
 
 ```bash
@@ -105,17 +142,31 @@ uv run flake8 .
 
 ## 🤖 Usage Examples
 
-### Basic RAG Workflow
+### Interactive Notebook Examples
+
+Check out `notebook/document.ipynb` for comprehensive examples including:
+
+- **Document Loading**: Loading text and PDF files
+- **Text Processing**: Using TextLoader and DirectoryLoader
+- **PDF Processing**: Working with PyPDFLoader and PyMuPDFLoader
+- **Document Structure**: Understanding LangChain Document objects
+
+### Basic RAG Workflow (Python Script)
 
 ```python
-from langchain.document_loaders import PyPDFLoader
+from langchain_community.document_loaders import TextLoader, DirectoryLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.vectorstores import Chroma
 from langchain.embeddings import OpenAIEmbeddings
 
-# Load and process documents
-loader = PyPDFLoader("document.pdf")
-documents = loader.load()
+# Load documents from directory
+dir_loader = DirectoryLoader(
+    "data/text_files",
+    glob="**/*.txt",
+    loader_cls=TextLoader,
+    loader_kwargs={'encoding': 'utf-8'}
+)
+documents = dir_loader.load()
 
 # Split documents into chunks
 text_splitter = RecursiveCharacterTextSplitter(
@@ -129,9 +180,20 @@ embeddings = OpenAIEmbeddings()
 vectorstore = Chroma.from_documents(texts, embeddings)
 
 # Query the documents
-query = "What is the main topic of this document?"
+query = "What is Python programming?"
 docs = vectorstore.similarity_search(query)
 ```
+
+### Sample Data
+
+The project includes sample data files:
+
+- **Text files** (`data/text_files/`):
+
+  - `python_intro.txt`: Introduction to Python programming
+  - `machine_learning.txt`: Machine learning basics
+
+- **PDF files** (`data/pdf_files/`): Add your own PDF documents for processing
 
 ## 🔒 Environment Variables
 
