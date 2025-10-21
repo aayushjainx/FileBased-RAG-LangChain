@@ -5,9 +5,11 @@ A Retrieval-Augmented Generation (RAG) application built with LangChain for docu
 ## 🚀 Features
 
 - **Document Processing**: Support for PDF and text documents using PyMuPDF and PyPDF
+- **Advanced Text Splitting**: Smart document chunking with RecursiveCharacterTextSplitter
+- **RAG Pipeline**: Complete data ingestion to vector database pipeline
 - **LangChain Integration**: Built with LangChain for robust AI workflows
 - **RAG Implementation**: Retrieve relevant information and generate accurate responses
-- **Jupyter Notebook Support**: Interactive development with document.ipynb
+- **Jupyter Notebook Support**: Interactive development with multiple notebooks
 - **Sample Data**: Pre-configured text and PDF files for testing
 - **Modern Python**: Uses Python 3.14 with UV package management
 
@@ -54,11 +56,13 @@ uv run main.py
    uv run jupyter notebook
    ```
 
-2. **Open the example notebook:**
-   Navigate to `notebook/document.ipynb` for interactive document processing examples
+2. **Open the example notebooks:**
+
+   - `notebook/document.ipynb` - Basic document processing examples
+   - `notebook/pdf_loader.ipynb` - Complete RAG pipeline with PDF processing
 
 3. **Alternative - Use VS Code:**
-   Open `notebook/document.ipynb` directly in VS Code with the Python extension
+   Open notebook files directly in VS Code with the Python extension for the best development experience
 
 ## 📁 Project Structure
 
@@ -76,7 +80,8 @@ langchain-rag/
 │   │   └── machine_learning.txt
 │   └── pdf_files/           # PDF documents for processing
 └── notebook/                # Jupyter notebooks
-    └── document.ipynb       # Interactive document processing examples
+    ├── document.ipynb       # Basic document processing examples
+    └── pdf_loader.ipynb     # Complete RAG pipeline implementation
 ```
 
 ## 📦 Dependencies
@@ -85,6 +90,7 @@ langchain-rag/
 - **langchain**: Core LangChain framework for building AI applications
 - **langchain-core**: Essential LangChain components and abstractions
 - **langchain-community**: Community-contributed LangChain integrations
+- **langchain-text-splitters**: Advanced text splitting utilities for document chunking
 - **pypdf**: Pure Python PDF library for reading PDF files
 - **pymupdf**: Python bindings for MuPDF (fast PDF processing)
 
@@ -144,18 +150,58 @@ uv run flake8 .
 
 ### Interactive Notebook Examples
 
-Check out `notebook/document.ipynb` for comprehensive examples including:
+**1. Basic Document Processing (`notebook/document.ipynb`):**
 
-- **Document Loading**: Loading text and PDF files
-- **Text Processing**: Using TextLoader and DirectoryLoader
-- **PDF Processing**: Working with PyPDFLoader and PyMuPDFLoader
-- **Document Structure**: Understanding LangChain Document objects
+- Document loading with TextLoader and DirectoryLoader
+- Working with LangChain Document objects
+- Basic PDF processing examples
+
+**2. Complete RAG Pipeline (`notebook/pdf_loader.ipynb`):**
+
+- Batch PDF processing from directories
+- Advanced text splitting with RecursiveCharacterTextSplitter
+- Document chunking with metadata preservation
+- Error handling and progress tracking
+- Ready for vector database integration
+
+### Key Features from Notebooks
+
+```python
+# Advanced PDF processing (from pdf_loader.ipynb)
+def process_all_pdfs(pdf_directory):
+    """Process all PDF files in a directory with error handling"""
+    all_documents = []
+    pdf_files = list(Path(pdf_directory).glob("**/*.pdf"))
+
+    for pdf_file in pdf_files:
+        loader = PyPDFLoader(str(pdf_file))
+        documents = loader.load()
+
+        # Add metadata
+        for doc in documents:
+            doc.metadata['source_file'] = pdf_file.name
+            doc.metadata['file_type'] = 'pdf'
+
+        all_documents.extend(documents)
+    return all_documents
+
+# Smart text splitting
+def split_documents(documents, chunk_size=1000, chunk_overlap=200):
+    """Split documents into optimized chunks for RAG"""
+    text_splitter = RecursiveCharacterTextSplitter(
+        chunk_size=chunk_size,
+        chunk_overlap=chunk_overlap,
+        length_function=len,
+        separators=["\n\n", "\n", " ", ""]
+    )
+    return text_splitter.split_documents(documents)
+```
 
 ### Basic RAG Workflow (Python Script)
 
 ```python
 from langchain_community.document_loaders import TextLoader, DirectoryLoader
-from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain.vectorstores import Chroma
 from langchain.embeddings import OpenAIEmbeddings
 
